@@ -1,0 +1,72 @@
+#!/bin/bash
+{{ $isWSL := and (eq .chezmoi.os "linux") .chezmoi.kernel (contains "microsoft" (lower .chezmoi.kernel.osrelease)) -}}
+
+{{ if eq .chezmoi.os "darwin" -}}
+
+# Add Homebrew Group to PATH
+if command -v "brew" &> /dev/null; then
+    eval "$(brew shellenv)"
+    alias brewup='brew update && brew upgrade'
+fi
+
+# Use 1Password's SSH agent
+# SSH_1PASSWORD_AGENT_SOCK=$HOME/.1Password/agent.sock
+# if [ -S $SSH_1PASSWORD_AGENT_SOCK ]; then
+#     export SSH_AUTH_SOCK=$SSH_1PASSWORD_AGENT_SOCK
+# fi
+# --> sh.env.local
+
+# Add Homebrew Group to PATH
+if command -v "trash" &> /dev/null; then
+    alias rm='trash'
+else
+    alias rm='echo "trash is not found.
+    Use 'trash' command instead of 'rm' to avoid accidental deletions."'
+fi
+
+if [ -d $HOME/.orbstack/shell ]; then
+    source $HOME/.orbstack/shell/init.zsh 2>/dev/null || :
+# TODO: XDG Base Directory Specification?
+# elif [ -d $HOME/.orbstack/shell ]; then
+#     source $HOME/.orbstack/shell/init.zsh 2>/dev/null || :
+fi
+
+if command -v mise &> /dev/null; then
+    eval "$(mise activate zsh)"
+fi
+
+{{ else if eq .chezmoi.os "linux" -}}
+
+alias aptup='sudo apt update && sudo apt upgrade '
+
+if command -v mise &> /dev/null; then
+    eval "$($HOME/.local/bin/mise activate zsh)"
+fi
+
+{{ if $isWSL -}}
+
+alias ssh='ssh.exe'
+alias ssh-add='ssh-add.exe'
+
+# WSL2で過去に使っていた1PasswordのSSHエージェント設定
+#
+# # ホストOSのSSHエージェントを使用
+# export SSH_AUTH_SOCK=$HOME/.ssh/agent.sock
+# # need `ps -ww` to get non-truncated command for matching
+# # use square brackets to generate a regex match for the process we want but that doesn't match the grep command running it!
+# ALREADY_RUNNING=$(ps -auxww | grep -q "[n]piperelay.exe -ei -s //./pipe/openssh-ssh-agent"; echo $?)
+# if [[ $ALREADY_RUNNING != "0" ]]; then
+#     if [[ -S $SSH_AUTH_SOCK ]]; then
+#         # not expecting the socket to exist as the forwarding command isn't running (http://www.tldp.org/LDP/abs/html/fto.html)
+#         echo "removing previous socket..."
+#         rm $SSH_AUTH_SOCK
+#     fi
+#     echo "Starting SSH-Agent relay..."
+#     # setsid to force new session to keep running
+#     # set socat to listen on $SSH_AUTH_SOCK and forward to npiperelay which then forwards to openssh-ssh-agent on windows
+#     (setsid socat UNIX-LISTEN:$SSH_AUTH_SOCK,fork EXEC:"npiperelay.exe -ei -s //./pipe/openssh-ssh-agent",nofork &) >/dev/null 2>&1
+# fi
+{{ end -}}
+
+{{ else -}}
+{{ end -}}

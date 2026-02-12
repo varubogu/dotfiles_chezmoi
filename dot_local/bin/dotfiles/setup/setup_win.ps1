@@ -1,0 +1,113 @@
+# PowerShell スクリプト
+
+# エラー発生時に実行を停止
+$ErrorActionPreference = "Stop"
+
+if (Get-Command pwsh -ErrorAction SilentlyContinue) {
+    Write-Host "pwsh がインストールされています。"
+    $EXECSHELL = "pwsh"
+    $is_pwsh = $true
+} else {
+    Write-Host "pwsh.exe が見つかりません。powershell.exeを使用します。"
+    $EXECSHELL = "powershell.exe"
+    $is_pwsh = $false
+}
+
+
+# 環境変数 DOTFILES_REPO_URL で上書き可能（private repo 等は secrets で対応）
+$REPO_URL = if ($env:DOTFILES_REPO_URL) { $env:DOTFILES_REPO_URL } else { "https://github.com/varubogu/dotfiles.git" }
+
+function Setup-Winget {
+    # https://learn.microsoft.com/ja-jp/windows/package-manager/winget/
+    $progressPreference = 'silentlyContinue'
+    Write-Host "Installing WinGet PowerShell module from PSGallery..."
+    Install-PackageProvider -Name NuGet -Force | Out-Null
+    Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery | Out-Null
+    Write-Host "Using Repair-WinGetPackageManager cmdlet to bootstrap WinGet..."
+    Repair-WinGetPackageManager -AllUsers -ErrorAction SilentlyContinue
+    Write-Host "Done."
+    Write-Host "winget version is..."
+    winget --version
+}
+
+function Setup-Git {
+    Write-Host "Checking git..."
+    if (Get-Command -name git -ErrorAction SilentlyContinue) {
+        Write-Host "git already installed"
+    } else {
+        Write-Host "git is not installed."
+        Write-Host "Installing git from winget..."
+        winget install git.git --source winget --accept-source-agreements
+
+        # インストール直後のシェルセッションではパスがまだ通っていないため一時的に登録（シェルセッション後に消える）
+        $GIT_COMMAND = "C:\Program Files\Git\cmd"
+        $env:PATH = "$env:PATH;$GIT_COMMAND"
+    }
+}
+
+function Setup-Chezmoi {
+    Write-Host "Checking chezmoi..."
+    if (Get-Command chezmoi -ErrorAction SilentlyContinue) {
+        Write-Host "chezmoi already installed"
+    } else {
+        Write-Host "chezmoi is not installed. Installing via winget..."
+        winget install twpayne.chezmoi --accept-source-agreements --accept-package-agreements
+    }
+
+    Write-Host "Cloning dotfiles..."
+    $chezmoiDir = "$env:USERPROFILE\.local\share\chezmoi"
+    if (Test-Path "$chezmoiDir\.git") {
+        Write-Host "chezmoi source already initialized"
+        chezmoi git pull
+    } else {
+        Write-Host "Initializing chezmoi from $REPO_URL"
+        chezmoi init --apply=false $REPO_URL
+    }
+}
+
+function Main {
+    # ホームディレクトリに移動
+    Set-Location "$env:USERPROFILE"
+
+    # 実行ポリシーを変更
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+    # wingetインストール
+    Setup-Winget
+
+    # wingetでGitインストール
+    Setup-Git
+
+    # chezmoiをインストール & dotfilesをclone
+    Setup-Chezmoi
+
+    # 3秒待つ
+    Start-Sleep -s 3
+
+    $BIN_DIR = "$env:USERPROFILE\.local\bin\dotfiles"
+
+    # XDG Base Directory Specificationを設定
+    Start-Process $EXECSHELL -ArgumentList '-File `$BIN_DIR\xdg_base_dir\setEnv.ps1`' -Verb RunAs
+
+    # アプリを一括インストール
+    Write-Host "install apps"
+    . "$BIN_DIR\install\install_windows.ps1"
+
+    # シンボリックリンクを貼る
+    Write-Host "symlink execution"
+    . "$BIN_DIR\symlink\symlink.ps1"
+
+    # 追加設定
+    if (Test-Path "$env:USERPROFILE/.local/bin/dotfiles/setup/setup.os.win.ps1") {
+        Write-Host "os specific setup"
+        . "$env:USERPROFILE/.local/bin/dotfiles/setup/setup.os.win.ps1"
+        Create-Local-Windows-Config
+        Write-Host "os specific setup done"
+    } else {
+        Write-Host "No os specific setup found"
+    }
+
+    Write-Host "Installed dotfiles successfully!"
+}
+
+Main
