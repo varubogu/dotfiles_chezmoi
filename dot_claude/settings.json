@@ -1,0 +1,63 @@
+{
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "linear@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(bun check:*)",
+      "Bash(bun test:*)",
+      "Bash(bun run test *:*)",
+      "Bash(cp:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(npx expo prebuild:*)",
+      "Bash(npx expo run:ios:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx vitest run:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm type-check)",
+      "Bash(pnpm db:generate:*)",
+      "Bash(pnpm db:seed-shisha:*)",
+      "Bash(pnpm db:studio:*)",
+      "Bash(pnpm test:*)",
+      "mcp__serena__list_dir",
+      "mcp__serena__search_for_pattern",
+      "mcp__serena__jet_brains_find_symbol",
+      "mcp__serena__replace_symbol_body",
+      "mcp__serena__find_symbol",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__find_file",
+      "mcp__serena__think_about_task_adherence",
+      "mcp__serena__check_onboarding_performed",
+      "mcp__serena__onboarding",
+      "mcp__serena__write_memory",
+      "mcp__serena__read_file",
+      "mcp__serena__read_memory",
+      "mcp__serena__think_about_collected_information",
+      "mcp__serena__think_about_whether_you_are_done",
+      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__context7__get-library-docs"
+    ],
+    "deny": [
+      "Bash(rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git checkout:*)",
+      "Bash(git restore:*)"
+    ]
+  }
+}
