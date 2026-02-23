@@ -6,6 +6,13 @@
 	"image": "mcr.microsoft.com/devcontainers/base:trixie",
 	"features": {
 		"ghcr.io/devcontainer-community/devcontainer-features/chezmoi.io:1": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"tamasfe.even-better-toml"
+			]
+		}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
