@@ -41,14 +41,12 @@
 {{ if $isContainer -}}
 # containerではgpg.ssh.programを設定せずホスト環境のgpg.ssh.programを使用する
 {{ else if eq .chezmoi.os "windows" -}}
-# gpg.ssh.programはlocal.windows.configで設定する
 [gpg "ssh"]
     program = "{{ env "LOCALAPPDATA" }}/Microsoft/WindowsApps/op-ssh-sign.exe"
 {{ else if eq .chezmoi.os "darwin" -}}
 [gpg "ssh"]
     program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 {{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
-# gpg.ssh.programはlocal.wsl.configで設定する
 [gpg "ssh"]
     program = "{{ env "WIN_HOME" }}/AppData/Local/Microsoft/WindowsApps/op-ssh-sign-wsl.exe"
 {{ else if eq .chezmoi.os "linux" -}}
@@ -57,14 +55,4 @@
     program = "/opt/1Password/op-ssh-sign"
 {{ else -}}
 # 設定対象外のOSではgpg.ssh.programを設定しない
-{{ end -}}
-
-{{ if and (eq .chezmoi.os "linux") ($isWSL) -}}
-[include]
-    # Git管理しないローカル設定ファイル（ユーザー名のパスなどを含むため分離）
-    path = "local.wsl.config"
-{{ else if eq .chezmoi.os "windows" -}}
-[include]
-    # Git管理しないローカル設定ファイル（ユーザー名のパスなどを含むため分離）
-    path = "local.windows.config"
 {{ end -}}
