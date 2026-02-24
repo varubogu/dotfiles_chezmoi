@@ -7,7 +7,7 @@
 
 [core]
 {{ if $isContainer -}}
-# containerではcore.sshCommandを設定しない
+# containerではcore.sshCommandを設定せずホスト環境のsshコマンドを使用する
 {{ else if eq .chezmoi.os "windows" -}}
     sshCommand = "C:/windows/System32/OpenSSH/ssh.exe"
 {{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
@@ -21,7 +21,7 @@
 {{ end -}}
 
 {{ if $isContainer -}}
-# containerではgpg.programを設定しない
+# containerではgpg.programを設定せずホスト環境のgpgコマンドを使用する
 {{ else if eq .chezmoi.os "windows" -}}
 [gpg]
     program = "C:/Program Files (x86)/GnuPG/bin/gpg.exe"
@@ -39,7 +39,7 @@
 {{ end -}}
 
 {{ if $isContainer -}}
-# containerではgpg.ssh.programを設定しない
+# containerではgpg.ssh.programを設定せずホスト環境のgpg.ssh.programを使用する
 {{ else if eq .chezmoi.os "windows" -}}
 # gpg.ssh.programはlocal.windows.configで設定する
 {{ else if eq .chezmoi.os "darwin" -}}
@@ -51,8 +51,6 @@
 [gpg "ssh"]
     # from: apt install 1password
     program = "/opt/1Password/op-ssh-sign"
-{{ else if $isContainer -}}
-# containerではgpg.ssh.programを設定しない
 {{ else -}}
 # 設定対象外のOSではgpg.ssh.programを設定しない
 {{ end -}}
