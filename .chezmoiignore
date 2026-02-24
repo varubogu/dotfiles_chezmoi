@@ -1,5 +1,6 @@
 .devcontainer/
 .github/
 .chezmoiignore
+dotfiles_chezmoi.code-workspace
 LICENSE
 README.md
