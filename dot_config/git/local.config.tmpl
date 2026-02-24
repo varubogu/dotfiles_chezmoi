@@ -5,34 +5,21 @@
 {{- $isContainer := or (stat "/.dockerenv") (stat "/run/.containerenv") -}}
 
 
+[core]
 {{ if eq .chezmoi.os "windows" -}}
-
-[core]
     sshCommand = "C:/windows/System32/OpenSSH/ssh.exe"
-
 {{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
-
-[core]
     sshCommand = "/mnt/c/windows/System32/OpenSSH/ssh.exe"
-
 {{ else if eq .chezmoi.os "darwin" -}}
-
 [core]
     sshCommand = "/usr/bin/ssh"
-
 {{ else if eq .chezmoi.os "linux" -}}
-
 [core]
     sshCommand = "/usr/bin/ssh"
-
 {{ else if $isContainer -}}
 # containerではsshCommandを設定しない
-
 {{ else -}}
-
-[core]
     sshCommand = ""
-
 {{ end -}}
 
 {{ if eq .chezmoi.os "windows" -}}
