@@ -12,9 +12,12 @@
 {{ else if eq .chezmoi.os "darwin" -}}
 [core]
     sshCommand = "/usr/bin/ssh"
-{{ else -}}
+{{ else if eq .chezmoi.os "linux" -}}
 [core]
     sshCommand = "/usr/bin/ssh"
+{{ else -}}
+[core]
+    sshCommand = ""
 {{ end -}}
 
 {{ if eq .chezmoi.os "windows" -}}
@@ -29,18 +32,25 @@
 {{ else if eq .chezmoi.os "linux" -}}
 [gpg]
 	program = "/usr/bin/gpg"
+{{ else -}}
+[gpg]
+    program = ""
 {{ end -}}
 
 {{ if eq .chezmoi.os "windows" -}}
-[gpg]
-    program = "C:/Program Files (x86)/GnuPG/bin/gpg.exe"
+# gpg.ssh.programはlocal.windows.configで設定する
 {{ else if eq .chezmoi.os "darwin" -}}
 [gpg "ssh"]
     program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 {{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
 # gpg.ssh.programはlocal.wsl.configで設定する
 {{ else if eq .chezmoi.os "linux" -}}
-program = "/opt/1Password/op-ssh-sign"
+[gpg "ssh"]
+    # from: apt install 1password
+    program = "/opt/1Password/op-ssh-sign"
+{{ else -}}
+[gpg "ssh"]
+    program = ""
 {{ end -}}
 
 {{ if and (eq .chezmoi.os "linux") ($isWSL) -}}
