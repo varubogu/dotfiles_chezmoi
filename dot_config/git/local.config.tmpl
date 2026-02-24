@@ -42,11 +42,15 @@
 # containerではgpg.ssh.programを設定せずホスト環境のgpg.ssh.programを使用する
 {{ else if eq .chezmoi.os "windows" -}}
 # gpg.ssh.programはlocal.windows.configで設定する
+[gpg "ssh"]
+    program = "{{ env "LOCALAPPDATA" }}/Microsoft/WindowsApps/op-ssh-sign.exe"
 {{ else if eq .chezmoi.os "darwin" -}}
 [gpg "ssh"]
     program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 {{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
 # gpg.ssh.programはlocal.wsl.configで設定する
+[gpg "ssh"]
+    program = "{{ env "WIN_HOME" }}/AppData/Local/Microsoft/WindowsApps/op-ssh-sign-wsl.exe"
 {{ else if eq .chezmoi.os "linux" -}}
 [gpg "ssh"]
     # from: apt install 1password

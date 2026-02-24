@@ -1,6 +1,6 @@
+#!/bin/bash
 {{ $isWSL := and (eq .chezmoi.os "linux") .chezmoi.kernel (contains "microsoft" (lower .chezmoi.kernel.osrelease)) -}}
 {{ if $isWSL -}}
-#!/bin/bash
 
 # Host User Name
 export WIN_USERNAME=$(powershell.exe '$env:USERNAME' | tr -d '\r')
@@ -71,6 +71,4 @@ create_ssh_signer() {
 create_win_home_symlink
 create_env_rc
 create_ssh_signer
-{{ else -}}
-#!/bin/bash
 {{ end -}}
