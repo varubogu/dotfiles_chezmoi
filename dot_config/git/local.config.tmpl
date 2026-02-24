@@ -2,6 +2,8 @@
 # Windowsはなぜかホームディレクトリ「~」は使えないので、相対パスで指定する
 
 {{- $isWSL := and .chezmoi.kernel (contains "microsoft" (lower .chezmoi.kernel.osrelease)) -}}
+{{- $isContainer := or (stat "/.dockerenv") (stat "/run/.containerenv") -}}
+
 
 {{ if eq .chezmoi.os "windows" -}}
 [core]
@@ -15,6 +17,8 @@
 {{ else if eq .chezmoi.os "linux" -}}
 [core]
     sshCommand = "/usr/bin/ssh"
+{{ else if $isContainer -}}
+# containerではsshCommandを設定しない
 {{ else -}}
 [core]
     sshCommand = ""
@@ -32,6 +36,8 @@
 {{ else if eq .chezmoi.os "linux" -}}
 [gpg]
 	program = "/usr/bin/gpg"
+{{ else if $isContainer -}}
+# containerではgpg.programを設定しない
 {{ else -}}
 [gpg]
     program = ""
@@ -48,6 +54,8 @@
 [gpg "ssh"]
     # from: apt install 1password
     program = "/opt/1Password/op-ssh-sign"
+{{ else if $isContainer -}}
+# containerではgpg.ssh.programを設定しない
 {{ else -}}
 [gpg "ssh"]
     program = ""
