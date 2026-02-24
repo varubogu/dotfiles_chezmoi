@@ -55,6 +55,8 @@ function Invoke-PowerShellScript {
 
 if (Is-Command-Exists starship) {
     Invoke-Expression (&starship init powershell)
+} else {
+    Write-Host "starship is not installed. Please install it first." -ForegroundColor Red
 }
 
 ### mise start

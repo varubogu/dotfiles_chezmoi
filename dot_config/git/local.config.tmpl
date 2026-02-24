@@ -1,67 +1,55 @@
 # TODO: Windowsマシンで動作確認。特にパスなどが間違えやすい
-
-{{ if eq .chezmoi.os "darwin" -}}
-
-[core]
-    sshCommand = "/usr/bin/ssh"
-
-[gpg]
-    program = "/opt/homebrew/bin/gpg"
-
-[gpg "ssh"]
-    program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-
-{{ else if eq .chezmoi.os "linux" -}}
+# Windowsはなぜかホームディレクトリ「~」は使えないので、相対パスで指定する
 
 {{- $isWSL := and .chezmoi.kernel (contains "microsoft" (lower .chezmoi.kernel.osrelease)) -}}
 
-{{ if $isWSL -}}
-
+{{ if eq .chezmoi.os "windows" -}}
+[core]
+    sshCommand = "C:/windows/System32/OpenSSH/ssh.exe"
+{{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
 [core]
     sshCommand = "/mnt/c/windows/System32/OpenSSH/ssh.exe"
+{{ else if eq .chezmoi.os "darwin" -}}
+[core]
+    sshCommand = "/usr/bin/ssh"
+{{ else -}}
+[core]
+    sshCommand = "/usr/bin/ssh"
+{{ end -}}
 
+{{ if eq .chezmoi.os "windows" -}}
+[gpg]
+    program = "C:/Program Files (x86)/GnuPG/bin/gpg.exe"
+{{ if eq .chezmoi.os "darwin" -}}
+[gpg]
+    program = "/opt/homebrew/bin/gpg"
+{{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
 [gpg]
 	program = "/usr/bin/gpg"
+{{ else if eq .chezmoi.os "linux" -}}
+[gpg]
+	program = "/usr/bin/gpg"
+{{ end -}}
 
+{{ if eq .chezmoi.os "windows" -}}
+[gpg]
+    program = "C:/Program Files (x86)/GnuPG/bin/gpg.exe"
+{{ if eq .chezmoi.os "darwin" -}}
+[gpg "ssh"]
+    program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+{{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
+{{ else if eq .chezmoi.os "linux" -}}
+{{ end -}}
+
+
+
+# Additional config
+{{ if and (eq .chezmoi.os "linux") ($isWSL) -}}
 [include]
     # Git管理しないローカル設定ファイル（ユーザー名のパスなどを含むため分離）
     path = "local.wsl.config"
-
-{{ else -}}
-
-[core]
-    sshCommand = "/usr/bin/ssh"
-
-#[gpg]
-#    program = "/usr/bin/gpg"
-
-[gpg "ssh"]
-    # from: apt install 1password
-    program = "/opt/1Password/op-ssh-sign"
-
-{{ end -}}
-
 {{ else if eq .chezmoi.os "windows" -}}
-
-# Windowsはなぜかホームディレクトリ「~」は使えないので、相対パスで指定する
-
-[core]
-    sshCommand = "C:/windows/System32/OpenSSH/ssh.exe"
-
-[gpg]
-    program = "C:/Program Files (x86)/GnuPG/bin/gpg.exe"
-
 [include]
     # Git管理しないローカル設定ファイル（ユーザー名のパスなどを含むため分離）
     path = "local.windows.config"
-{{ else -}}
-[core]
-    sshCommand = ""
-
-[gpg]
-    program = ""
-
-[gpg "ssh"]
-    program = ""
 {{ end -}}
-
