@@ -20,7 +20,7 @@
 {{ if eq .chezmoi.os "windows" -}}
 [gpg]
     program = "C:/Program Files (x86)/GnuPG/bin/gpg.exe"
-{{ if eq .chezmoi.os "darwin" -}}
+{{ else if eq .chezmoi.os "darwin" -}}
 [gpg]
     program = "/opt/homebrew/bin/gpg"
 {{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
@@ -34,16 +34,15 @@
 {{ if eq .chezmoi.os "windows" -}}
 [gpg]
     program = "C:/Program Files (x86)/GnuPG/bin/gpg.exe"
-{{ if eq .chezmoi.os "darwin" -}}
+{{ else if eq .chezmoi.os "darwin" -}}
 [gpg "ssh"]
     program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 {{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
+# gpg.ssh.programはlocal.wsl.configで設定する
 {{ else if eq .chezmoi.os "linux" -}}
+program = "/opt/1Password/op-ssh-sign"
 {{ end -}}
 
-
-
-# Additional config
 {{ if and (eq .chezmoi.os "linux") ($isWSL) -}}
 [include]
     # Git管理しないローカル設定ファイル（ユーザー名のパスなどを含むため分離）
