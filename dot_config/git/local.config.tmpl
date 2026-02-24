@@ -6,23 +6,23 @@
 
 
 [core]
-{{ if eq .chezmoi.os "windows" -}}
+{{ if $isContainer -}}
+# containerではcore.sshCommandを設定しない
+{{ else if eq .chezmoi.os "windows" -}}
     sshCommand = "C:/windows/System32/OpenSSH/ssh.exe"
 {{ else if and (eq .chezmoi.os "linux") ($isWSL) -}}
     sshCommand = "/mnt/c/windows/System32/OpenSSH/ssh.exe"
 {{ else if eq .chezmoi.os "darwin" -}}
-[core]
     sshCommand = "/usr/bin/ssh"
 {{ else if eq .chezmoi.os "linux" -}}
-[core]
     sshCommand = "/usr/bin/ssh"
-{{ else if $isContainer -}}
-# containerではsshCommandを設定しない
 {{ else -}}
-    sshCommand = ""
+# 設定対象外のOSではcore.sshCommandを設定しない
 {{ end -}}
 
-{{ if eq .chezmoi.os "windows" -}}
+{{ if $isContainer -}}
+# containerではgpg.programを設定しない
+{{ else if eq .chezmoi.os "windows" -}}
 [gpg]
     program = "C:/Program Files (x86)/GnuPG/bin/gpg.exe"
 {{ else if eq .chezmoi.os "darwin" -}}
@@ -34,14 +34,13 @@
 {{ else if eq .chezmoi.os "linux" -}}
 [gpg]
 	program = "/usr/bin/gpg"
-{{ else if $isContainer -}}
-# containerではgpg.programを設定しない
 {{ else -}}
-[gpg]
-    program = ""
+# 設定対象外のOSではgpg.programを設定しない
 {{ end -}}
 
-{{ if eq .chezmoi.os "windows" -}}
+{{ if $isContainer -}}
+# containerではgpg.ssh.programを設定しない
+{{ else if eq .chezmoi.os "windows" -}}
 # gpg.ssh.programはlocal.windows.configで設定する
 {{ else if eq .chezmoi.os "darwin" -}}
 [gpg "ssh"]
@@ -55,8 +54,7 @@
 {{ else if $isContainer -}}
 # containerではgpg.ssh.programを設定しない
 {{ else -}}
-[gpg "ssh"]
-    program = ""
+# 設定対象外のOSではgpg.ssh.programを設定しない
 {{ end -}}
 
 {{ if and (eq .chezmoi.os "linux") ($isWSL) -}}
